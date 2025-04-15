@@ -1,0 +1,140 @@
+--// For Dino & Galaxy Collab
+-- sigma
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+local Mouse = LocalPlayer:GetMouse()
+local targetaim = true
+local CamlockState = false
+local CurrentCamera = game:GetService("Workspace").CurrentCamera
+local Prediction = 0.13114728784926682833
+local AimPart = "Head"
+
+local Locked = true
+getgenv().Key = "q"
+local Player = nil
+
+function FindClosestPlayer()
+    local ClosestDistance = math.huge
+    local ClosestPlayer = nil
+    local ClosestPart = nil
+    for _, Player in pairs(Players:GetPlayers()) do
+        if Player ~= LocalPlayer then
+            local Character = Player.Character
+            if Character and Character:FindFirstChild("Humanoid") and Character.Humanoid.Health > 0 then
+                local Part = Character:FindFirstChild(AimPart)
+                if Part then
+                    local Position, IsVisibleOnViewPort = CurrentCamera:WorldToViewportPoint(Character.HumanoidRootPart.Position)
+                    if IsVisibleOnViewPort then
+                        local Distance = (LocalPlayer.Character[AimPart].Position - Part.Position).Magnitude
+                        if Distance < ClosestDistance then
+                            ClosestPlayer = Player
+                            ClosestPart = Part
+                            ClosestDistance = Distance
+                        end
+                    end
+                end
+            end
+        end
+    end
+    return ClosestPlayer, ClosestPart
+end
+
+
+Mouse.KeyDown:Connect(function(k)
+    if k == getgenv().Key then
+        Locked = not Locked
+        if Locked then
+            Player, ClosestPart = FindClosestPlayer()
+            CamlockState = true
+        else
+            Player, ClosestPart = nil, nil
+            CamlockState = false
+        end
+    end
+end)
+
+local mt = getrawmetatable(game)
+local old = mt.__index
+setreadonly(mt, false)
+
+mt.__index = newcclosure(function(self, key)
+    if not checkcaller() and targetaim and typeof(self) == "Instance" and self:IsA("Mouse") and key == "Hit" then
+        if Player and Player.Character and Player.Character:FindFirstChild(AimPart) then
+            local target = Player.Character[AimPart]
+            local Position = target.Position + (target.Velocity * Prediction)
+            return CFrame.new(Position)
+        end
+    end
+    return old(self, key)
+end)
+
+-- GUI Setup
+local Galaxy = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local UICorner = Instance.new("UICorner")
+local Logo = Instance.new("ImageLabel")
+local TextButton = Instance.new("TextButton")
+local UICorner_2 = Instance.new("UICorner")
+
+Galaxy.Name = "Galaxy"
+Galaxy.Parent = game.CoreGui
+Galaxy.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+Frame.Parent = Galaxy
+Frame.BackgroundColor3 = Color3.fromRGB(128, 0, 128) -- Purple
+Frame.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Frame.BorderSizePixel = 0
+Frame.Position = UDim2.new(0.133798108, 0, 0.20107238, 0)
+Frame.Size = UDim2.new(0, 202, 0, 70)
+Frame.Active = true
+Frame.Draggable = true
+
+local function TopContainer()
+    Frame.Position = UDim2.new(0.5, -Frame.AbsoluteSize.X / 2, 0, -Frame.AbsoluteSize.Y / 2)
+end
+
+TopContainer()
+Frame:GetPropertyChangedSignal("AbsoluteSize"):Connect(TopContainer)
+
+UICorner.Parent = Frame
+
+Logo.Name = "Logo"
+Logo.Parent = Frame
+Logo.BackgroundColor3 = Color3.fromRGB(100, 255, 100)
+Logo.BackgroundTransparency = 3.000
+Logo.BorderColor3 = Color3.fromRGB(0, 0, 0)
+Logo.BorderSizePixel = 0
+Logo.Position = UDim2.new(0.326732665, 0, 0, 0)
+Logo.Size = UDim2.new(0, 70, 0, 70)
+Logo.Image = "rbxassetid://830610397"
+Logo.ImageTransparency = 0.300
+
+TextButton.Parent = Frame
+TextButton.BackgroundColor3 = Color3.fromRGB(75, 80, 255)
+TextButton.BackgroundTransparency = 5.000
+TextButton.BorderColor3 = Color3.fromRGB(0, 0, 0)
+TextButton.BorderSizePixel = 0
+TextButton.Position = UDim2.new(0.0792079195, 0, 0.18571429, 0)
+TextButton.Size = UDim2.new(0, 170, 0, 44)
+TextButton.Font = Enum.Font.SourceSansSemibold
+TextButton.Text = "Toggle Galaxy"
+TextButton.TextColor3 = Color3.fromRGB(0, 0, 0) -- Black text
+TextButton.TextScaled = true
+TextButton.TextSize = 18.000
+TextButton.TextWrapped = true
+
+local state = true
+TextButton.MouseButton1Click:Connect(function()
+    state = not state
+    if not state then
+        TextButton.Text = "Galaxy.Tech ON"
+        CamlockState = true
+        Player, ClosestPart = FindClosestPlayer()
+    else
+        TextButton.Text = "Galaxy.Tech OFF"
+        CamlockState = false
+        Player, ClosestPart = nil, nil
+    end
+end)
