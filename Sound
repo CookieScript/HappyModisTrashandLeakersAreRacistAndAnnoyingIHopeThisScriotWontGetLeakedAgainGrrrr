@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sound Detector</title>
+<style>
+  body { margin: 0; background: #000; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let angle = 0;
+
+navigator.mediaDevices.getUserMedia({ audio: true }).then(stream => {
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  const source = audioCtx.createMediaStreamSource(stream);
+  const analyser = audioCtx.createAnalyser();
+  analyser.fftSize = 256;
+  source.connect(analyser);
+
+  const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+  function draw() {
+    requestAnimationFrame(draw);
+
+    analyser.getByteFrequencyData(dataArray);
+    let sum = 0;
+    for (let i = 0; i < dataArray.length; i++) {
+      sum += dataArray[i];
+    }
+    const loudness = sum / dataArray.length;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    let color = `rgb(${Math.min(255, loudness * 3)}, ${255 - Math.min(255, loudness * 3)}, 0)`;
+
+    ctx.save();
+    ctx.translate(canvas.width / 2, canvas.height / 2);
+    ctx.rotate(angle);
+
+    ctx.fillStyle = color;
+    ctx.beginPath();
+    ctx.moveTo(0, -50);
+    ctx.lineTo(20, 50);
+    ctx.lineTo(-20, 50);
+    ctx.closePath();
+    ctx.fill();
+    ctx.restore();
+
+    if (loudness > 30) {
+      angle += 0.05;
+    } else {
+      angle += 0.005;
+    }
+  }
+
+  draw();
+});
+</script>
+
+</body>
+</html>
