@@ -1,0 +1,18 @@
+return {
+    "Head",
+    "HumanoidRootPart",
+    "UpperTorso",
+    "LowerTorso",
+    "LeftHand",
+    "LeftLowerArm",
+    "LeftUpperArm",
+    "RightHand",
+    "RightLowerArm",
+    "RightUpperArm",
+    "LeftFoot",
+    "LeftLowerLeg",
+    "LeftUpperLeg",
+    "RightFoot",
+    "RightLowerLeg",
+    "RightUpperLeg",
+}
