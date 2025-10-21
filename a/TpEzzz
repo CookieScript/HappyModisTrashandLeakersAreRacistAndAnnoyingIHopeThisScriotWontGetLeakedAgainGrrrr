@@ -3,7 +3,7 @@ function IsPlayers(count)
     return #Players:GetPlayers() - 1 == count
 end
 
-if IsPlayers(0) then
+if not IsPlayers(0) then
     game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
     queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/CookieScript/HappyModisTrashandLeakersAreRacistAndAnnoyingIHopeThisScriotWontGetLeakedAgainGrrrr/refs/heads/main/a/TpEzzz"))()]])
 end
