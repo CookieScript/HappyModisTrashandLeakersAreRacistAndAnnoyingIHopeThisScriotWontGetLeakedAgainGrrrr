@@ -1,0 +1,9 @@
+function IsPlayers(count)
+    local Players = game:GetService("Players")
+    return #Players:GetPlayers() - 1 == count
+end
+
+if IsPlayers(0) then
+    game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
+    queue_on_teleport([[loadstring(game:HttpGet(""))()]])
+end
