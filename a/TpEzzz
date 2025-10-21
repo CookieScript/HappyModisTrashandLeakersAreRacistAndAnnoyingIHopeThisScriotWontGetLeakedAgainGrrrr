@@ -5,5 +5,5 @@ end
 
 if IsPlayers(0) then
     game:GetService("TeleportService"):Teleport(game.PlaceId, game.Players.LocalPlayer)
-    queue_on_teleport([[loadstring(game:HttpGet(""))()]])
+    queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/CookieScript/HappyModisTrashandLeakersAreRacistAndAnnoyingIHopeThisScriotWontGetLeakedAgainGrrrr/refs/heads/main/a/TpEzzz"))()]])
 end
